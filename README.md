@@ -36,17 +36,17 @@ Implement and evaluate a recursive parallel Merge Sort algorithm capable of sort
 * [x] Performance benchmarks
 * [ ] Final documentation
 
-## Performance Results
+## Performance Summary
 
-The parallel implementation was evaluated using 4 processor cores and a maximum parallel recursion depth of 2.
+The parallel implementation was evaluated using a 4-core processor.
 
-| Input Size | Sequential (ms) | Parallel (ms) | Speedup | Efficiency |
-|-----------:|----------------:|--------------:|--------:|-----------:|
-| 100,000    | 31.33           | 19.33         | 1.62x   | 40.52%     |
-| 500,000    | 169.33          | 93.00         | 1.82x   | 45.52%     |
-| 1,000,000  | 340.67          | 189.33        | 1.80x   | 44.98%     |
-| 2,000,000  | 686.33          | 390.00        | 1.76x   | 44.00%     |
+The best configuration was `MaxDepth = 2`, achieving:
 
-The results show that the parallel implementation consistently outperformed the sequential implementation. The highest observed speedup was 1.82x for 500,000 elements.
+- Average parallel execution time: **186.60 ms**
+- Average sequential execution time: **331.20 ms**
+- Speedup: **1.77x**
+- Efficiency: **44.37%**
 
-Automated unit tests: **10/10 passed**.
+The results showed that increasing the recursion depth beyond 2 did not improve performance due to additional task-management overhead.
+
+The scalability benchmark also showed consistent performance improvements for input sizes from 100,000 to 2,000,000 elements.

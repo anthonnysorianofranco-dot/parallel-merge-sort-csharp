@@ -6,40 +6,34 @@ class Program
 {
     static void Main()
     {
-        int[] inputSizes =
-        {
-            100_000,
-            500_000,
-            1_000_000,
-            2_000_000
-        };
+        const int inputSize = 1_000_000;
+        const int runs = 5;
 
-        const int maxDepth = 2;
-        const int runs = 3;
+        int[] depths = { 1, 2, 3 };
 
-        Console.WriteLine("Parallel Merge Sort - Scalability Benchmark");
+        Console.WriteLine("Parallel Merge Sort - Performance Analysis");
         Console.WriteLine();
         Console.WriteLine($"Processor count: {Environment.ProcessorCount}");
-        Console.WriteLine($"MaxDepth: {maxDepth}");
-        Console.WriteLine($"Runs per input size: {runs}");
+        Console.WriteLine($"Input size: {inputSize:N0}");
+        Console.WriteLine($"Benchmark runs per depth: {runs}");
         Console.WriteLine();
 
-        foreach (int size in inputSizes)
+        foreach (int depth in depths)
         {
-            RunScalabilityBenchmark(
-                size,
-                maxDepth,
+            RunDepthBenchmark(
+                inputSize,
+                depth,
                 runs);
         }
     }
 
-    static void RunScalabilityBenchmark(
+    static void RunDepthBenchmark(
         int size,
         int maxDepth,
         int runs)
     {
         Console.WriteLine(
-            $"===== Input Size: {size:N0} =====");
+            $"===== MaxDepth: {maxDepth} =====");
 
         long sequentialTotal = 0;
         long parallelTotal = 0;
@@ -69,9 +63,6 @@ class Program
 
             sequentialTimer.Stop();
 
-            long sequentialTime =
-                sequentialTimer.ElapsedMilliseconds;
-
             // ==========================
             // Parallel
             // ==========================
@@ -87,9 +78,6 @@ class Program
                 maxDepth);
 
             parallelTimer.Stop();
-
-            long parallelTime =
-                parallelTimer.ElapsedMilliseconds;
 
             // ==========================
             // Validation
@@ -109,6 +97,12 @@ class Program
                 return;
             }
 
+            long sequentialTime =
+                sequentialTimer.ElapsedMilliseconds;
+
+            long parallelTime =
+                parallelTimer.ElapsedMilliseconds;
+
             sequentialTotal += sequentialTime;
             parallelTotal += parallelTime;
 
@@ -117,6 +111,10 @@ class Program
                 $"Sequential = {sequentialTime} ms | " +
                 $"Parallel = {parallelTime} ms");
         }
+
+        // ==========================
+        // Metrics
+        // ==========================
 
         double sequentialAverage =
             (double)sequentialTotal / runs;
@@ -152,7 +150,9 @@ class Program
         for (int i = 1; i < array.Length; i++)
         {
             if (array[i - 1] > array[i])
+            {
                 return false;
+            }
         }
 
         return true;
