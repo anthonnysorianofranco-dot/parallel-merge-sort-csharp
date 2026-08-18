@@ -1,74 +1,66 @@
-
-### `docs/technical-design.md`
-
-`markdown`
 # Technical Design
 
 ## 1. General Description
 
-Parallel Merge Sort is an application developed in C# that compares a sequential implementation of Merge Sort with a parallel implementation using the Task Parallel Library (TPL).
+Parallel Merge Sort es una aplicación desarrollada en C# que compara una implementación secuencial de Merge Sort con una implementación paralela utilizando la Task Parallel Library (TPL).
 
-The parallel implementation applies recursive decomposition to divide the sorting problem into smaller independent subproblems.
+La implementación paralela aplica descomposición recursiva para dividir el problema de ordenamiento en subproblemas independientes más pequeños.
 
-The main objective is to evaluate the advantages and limitations of parallel execution using:
+El objetivo principal es evaluar las ventajas y limitaciones de la ejecución paralela utilizando:
 
-- Execution time.
-- Speedup.
-- Efficiency.
-- Scalability.
-- Different levels of parallelism.
+- Tiempo de ejecución.
+- Speedup (Aceleración).
+- Eficiencia.
+- Escalabilidad.
+- Diferentes niveles de paralelismo.
+
+---
 
 ## 2. System Architecture
 
-The project is organized into several components.
+El proyecto está organizado en varios componentes:
 
 ### `Program.cs`
+El punto de entrada de la aplicación.
 
-The entry point of the application.
-
-Responsibilities:
-
-- Generate input data.
-- Execute the sequential algorithm.
-- Execute the parallel algorithm.
-- Measure execution time.
-- Calculate Speedup and Efficiency.
-- Run performance benchmarks.
-- Validate results.
+**Responsabilidades:**
+- Generar datos de entrada.
+- Ejecutar el algoritmo secuencial.
+- Ejecutar el algoritmo paralelo.
+- Medir el tiempo de ejecución.
+- Calcular el Speedup y la Eficiencia.
+- Ejecutar benchmarks de rendimiento.
+- Validar resultados.
 
 ### `MergeSorter.cs`
+Contiene la implementación secuencial de Merge Sort.
 
-Contains the sequential Merge Sort implementation.
-
-The class performs recursive division of the array and uses the `Merge` operation to combine sorted portions.
+La clase realiza la división recursiva del arreglo y utiliza la operación `Merge` para combinar las porciones ordenadas.
 
 ### `ParallelMergeSorter.cs`
+Contiene la implementación paralela.
 
-Contains the parallel implementation.
-
-Main characteristics:
-
-- Recursive decomposition.
-- `Task.Run`.
-- Concurrent execution of left and right branches.
-- Configurable maximum depth.
-- `Task.WaitAll` synchronization.
+**Características principales:**
+- Descomposición recursiva.
+- USO de `Task.Run`.
+- Ejecución concurrente de ramas izquierda y derecha.
+- Profundidad máxima configurable.
+- Sincronización mediante `Task.WaitAll`.
 
 ### `ParallelMergeSort.Tests`
-
-Contains automated xUnit tests used to verify the correctness of the sorting algorithms.
+Contiene pruebas automatizadas con xUnit utilizadas para verificar la corrección de los algoritmos de ordenamiento.
 
 ### `metrics/`
+Contiene los resultados de benchmarks e información de rendimiento.
 
-Contains benchmark results and performance information.
+---
 
 ## 3. Recursive Decomposition
 
-Merge Sort follows the divide-and-conquer strategy.
+Merge Sort sigue la estrategia de "divide y vencerás".
 
-The algorithm repeatedly divides the array into two halves.
+El algoritmo divide repetidamente el arreglo en dos mitades:
 
-`text`
                  Array
                 /     \
                /       \
@@ -79,17 +71,17 @@ The algorithm repeatedly divides the array into two halves.
           Smaller       Smaller
           problems      problems
 
-After the recursive sorting operations finish, the two sorted portions are merged.
+Después de que finalizan las operaciones recursivas de ordenamiento, las dos porciones ordenadas se fusionan.
 
-The parallel version takes advantage of the fact that the left and right portions can be processed independently.
+La versión paralela aprovecha el hecho de que las porciones izquierda y derecha se pueden procesar de forma independiente.
 
 ---
 
 ## 4. Parallelization Strategy
 
-The parallel implementation uses Task to execute the two recursive branches concurrently.
+La implementación paralela utiliza `Task` para ejecutar las dos ramas recursivas concurrentemente.
 
-The main strategy is:
+La estrategia principal es:
 
                 Array
                /     \
@@ -104,25 +96,21 @@ The main strategy is:
                   |
                 Merge
 
-The implementation does not create tasks at every recursion level.
+La implementación no crea tareas en cada nivel de recursión. En su lugar, utiliza un `maxDepth` configurable.
 
-Instead, it uses a configurable maxDepth.
+Cuando la profundidad actual está por debajo de la profundidad máxima, las ramas izquierda y derecha se ejecutan utilizando tareas separadas.
 
-When the current depth is below the maximum depth, the left and right branches are executed using separate tasks.
-
-When the maximum depth is reached, the remaining recursive operations execute sequentially.
-
-This approach limits task creation overhead.
+Cuando se alcanza la profundidad máxima, las operaciones recursivas restantes se ejecutan secuencialmente. Esto limita el sobrecoste (*overhead*) de creación de tareas.
 
 ---
 
 ## 5. Maximum Parallel Depth
 
-The maximum parallel depth controls how much concurrency is introduced into the algorithm.
+La profundidad máxima paralela controla cuánta concurrencia se introduce en el algoritmo.
 
-The application uses a maximum depth of 2 for the main scalability benchmark because the test machine has four logical processors.
+La aplicación utiliza una profundidad máxima de 2 para el benchmark principal de escalabilidad, ya que la máquina de prueba cuenta con cuatro procesadores lógicos.
 
-The relationship can be represented as:
+La relación se puede representar como:
 
 Depth 0
         |
@@ -133,21 +121,21 @@ Depth 0
      /     \          /     \
    Depth 2 Depth 2  Depth 2 Depth 2
 
-This creates four primary recursive portions.
+Esto crea cuatro porciones recursivas primarias.
 
-Using excessive depth could create more tasks than the processor can efficiently execute, increasing task scheduling and synchronization overhead.
+Utilizar una profundidad excesiva podría crear más tareas de las que el procesador puede ejecutar eficientemente, aumentando el sobrecoste de planificación y sincronización de tareas.
 
 ---
 
 ## 6. Synchronization
 
-The parallel implementation must ensure that both recursive branches have completed before merging their results.
+La implementación paralela debe garantizar que ambas ramas recursivas hayan completado antes de fusionar sus resultados.
 
-This is achieved using:
+Esto se logra utilizando:
 
-Task.WaitAll(leftTask, rightTask);
+`Task.WaitAll(leftTask, rightTask);`
 
-The synchronization sequence is:
+La secuencia de sincronización es:
 
 Left Task  --------\
                     \
@@ -155,182 +143,141 @@ Left Task  --------\
                     /
 Right Task --------/
 
-Task.WaitAll prevents the merge operation from starting before both branches are finished.
+`Task.WaitAll` evita que la operación de fusión comience antes de que ambas ramas hayan terminado.
 
 ---
 
 ## 7. Merge Operation
 
-The Merge operation combines two already sorted portions of the array.
+La operación `Merge` combina dos porciones del arreglo que ya están ordenadas.
 
-For example:
+Por ejemplo:
+- Izquierda: `[1, 4, 7]`
+- Derecha: `[2, 3, 8]`
+- Resultado: `[1, 2, 3, 4, 7, 8]`
 
-Left:  [1, 4, 7]
-Right: [2, 3, 8]
+La operación de fusión utiliza un arreglo temporal para almacenar resultados intermedios antes de copiarlos de regreso al arreglo original.
 
-
-Result:
-
-
-[1, 2, 3, 4, 7, 8]
-
-The merge operation uses a temporary array to store intermediate results before copying them back to the original array.
-
-Both sequential and parallel implementations use the same merge logic.
+Tanto la implementación secuencial como la paralela comparten la misma lógica de fusión.
 
 ---
 
 ## 8. Complexity Analysis
 
-Merge Sort has a time complexity of:
+Merge Sort tiene una complejidad temporal de:
 
-O(n log n)
+$$O(n \log n)$$
 
-for the best, average, and worst cases.
+para los casos mejor, promedio y peor.
 
-The additional temporary storage required by the algorithm is:
+El almacenamiento temporal adicional requerido por el algoritmo es:
 
-O(n)
+$$O(n)$$
 
-The parallel version maintains the same general computational complexity, but distributes independent recursive work among processor resources.
+La versión paralela mantiene la misma complejidad computacional general, pero distribuye el trabajo recursivo independiente entre los recursos del procesador.
 
-The practical performance improvement depends on:
-
-Number of processor cores.
-Input size.
-Task scheduling overhead.
-Synchronization overhead.
-Merge operations.
-Maximum parallel depth.
+La mejora práctica del rendimiento depende de:
+- Número de núcleos del procesador.
+- Tamaño de la entrada.
+- Sobrecoste de planificación de tareas.
+- Sobrecoste de sincronización.
+- Operaciones de fusión.
+- Profundidad máxima paralela.
 
 ---
 
 ## 9. Performance Metrics
 
-The application calculates three main performance metrics.
+La aplicación calcula tres métricas principales de rendimiento:
 
-Execution Time
-
-The elapsed time required to sort the input.
-
-Speedup
-Speedup = Sequential Time / Parallel Time
-
-For example, if the sequential implementation takes 400 ms and the parallel implementation takes 200 ms:
-
-Speedup = 400 / 200
-Speedup = 2.0x
-Efficiency
-Efficiency = Speedup / Processor Count × 100
-
-With four processors and a speedup of 2.0x:
-
-Efficiency = 2.0 / 4 × 100
-Efficiency = 50%
+- **Tiempo de Ejecución:** El tiempo transcurrido necesario para ordenar la entrada.
+- **Speedup (Aceleración):**
+  $$\text{Speedup} = \frac{\text{Tiempo Secuencial}}{\text{Tiempo Paralelo}}$$
+  Por ejemplo, si la implementación secuencial toma 400 ms y la paralela 200 ms:
+  $$\text{Speedup} = \frac{400}{200} = 2.0x$$
+- **Eficiencia:**
+  $$\text{Eficiencia} = \frac{\text{Speedup}}{\text{Número de Procesadores}} \times 100$$
+  Con cuatro procesadores y un Speedup de 2.0x:
+  $$\text{Eficiencia} = \frac{2.0}{4} \times 100 = 50\%$$
 
 ---
 
 ## 10. Benchmark Design
 
-The benchmark executes multiple runs for each configuration.
+El benchmark ejecuta múltiples iteraciones para cada configuración.
 
-For scalability testing, the application uses:
+Para las pruebas de escalabilidad, la aplicación utiliza tamaños de:
+- 100,000 elementos.
+- 500,000 elementos.
+- 1,000,000 elementos.
+- 2,000,000 elementos.
 
-100,000
-500,000
-1,000,000
-2,000,000
+Para las pruebas de profundidad de paralelización, la aplicación compara:
+- `MaxDepth = 1`
+- `MaxDepth = 2`
+- `MaxDepth = 3`
 
-elements.
-
-For parallelization-depth testing, the application compares:
-
-MaxDepth = 1
-MaxDepth = 2
-MaxDepth = 3
-
-Multiple runs are performed to reduce the effect of individual execution variations.
-
-Average execution time is used for the main performance comparison.
+Se realizan múltiples ejecuciones para reducir el efecto de las variaciones individuales de ejecución, utilizando el tiempo medio de ejecución para la comparación principal.
 
 ---
 
 ## 11. Testing Strategy
 
-Automated tests are implemented using xUnit.
+Las pruebas automatizadas están implementadas con xUnit.
 
-The test suite verifies the correctness of the sorting implementations using different types of input.
+La suite de pruebas verifica la corrección de los algoritmos de ordenamiento utilizando diferentes tipos de entrada:
+- Arreglos vacíos.
+- Arreglos de un solo elemento.
+- Arreglos ya ordenados.
+- Arreglos ordenados a la inversa.
+- Arreglos con valores duplicados.
+- Valores aleatorios.
 
-The tests include scenarios such as:
+Actualmente, la suite reporta:
+- Pruebas totales: 10
+- Pasadas: 10
+- Falladas: 0
+- Omitidas: 0
 
-Empty arrays.
-Single-element arrays.
-Already sorted arrays.
-Reverse-ordered arrays.
-Arrays with duplicate values.
-Random values.
-
-The test suite currently reports:
-
-Total tests: 10
-Passed: 10
-Failed: 0
-Skipped: 0
-
-This confirms that the implemented sorting operations produce correctly ordered results for the tested cases.
+Esto confirma que las operaciones de ordenamiento producen resultados correctamente ordenados para los casos probados.
 
 ---
 
 ## 12. Scalability
 
-The parallel implementation was evaluated using increasing input sizes.
+La implementación paralela se evaluó utilizando tamaños de entrada crecientes.
 
-The benchmark produced the following averages:
+El benchmark produjo los siguientes promedios:
 
-| Input Size | Sequential |  Parallel | Speedup | Efficiency |
-| ---------: | ---------: | --------: | ------: | ---------: |
-|    100,000 |   31.33 ms |  19.33 ms |   1.62x |     40.52% |
-|    500,000 |  169.33 ms |  93.00 ms |   1.82x |     45.52% |
-|  1,000,000 |  340.67 ms | 189.33 ms |   1.80x |     44.98% |
-|  2,000,000 |  686.33 ms | 390.00 ms |   1.76x |     44.00% |
+| Input Size | Sequential | Parallel | Speedup | Efficiency |
+| ---------: | ---------: | -------: | ------: | ---------: |
+|    100,000 |   31.33 ms | 19.33 ms |   1.62x |     40.52% |
+|    500,000 |  169.33 ms | 93.00 ms |   1.82x |     45.52% |
+|  1,000,000 |  340.67 ms |189.33 ms |   1.80x |     44.98% |
+|  2,000,000 |  686.33 ms |390.00 ms |   1.76x |     44.00% |
 
+La implementación paralela fue más rápida para todos los tamaños probados.
 
-The parallel implementation was faster for every tested input size.
-
-The results also show that speedup does not increase indefinitely because parallel execution introduces task-management, synchronization, and merge overhead.
+Los resultados también muestran que el Speedup no aumenta indefinidamente debido a que la ejecución paralela introduce sobrecostes de gestión de tareas, sincronización y fusión.
 
 ---
 
 ## 13. Limitations
 
-The implementation has several limitations.
+La implementación presenta varias limitaciones:
 
-Processor dependency
-
-Performance depends on the number of available processor cores.
-
-Task overhead
-
-Creating and scheduling tasks introduces additional overhead.
-
-Synchronization overhead
-
-The recursive branches must synchronize before the merge operation.
-
-Memory usage
-
-Merge Sort requires additional memory for temporary arrays.
-
-Benchmark variability
-
-Execution times can vary between runs because of operating system activity, background processes, processor scheduling, and other environmental factors.
+- **Dependencia del procesador:** El rendimiento depende del número de núcleos disponibles.
+- **Sobrecoste de tareas:** La creación y planificación de tareas introduce tiempo adicional.
+- **Sobrecoste de sincronización:** Las ramas recursivas deben sincronizarse antes de la operación de fusión.
+- **Uso de memoria:** Merge Sort requiere memoria adicional para arreglos temporales.
+- **Variabilidad del benchmark:** Los tiempos pueden variar entre ejecuciones debido a la actividad del sistema operativo, procesos en segundo plano y planificación del procesador.
 
 ---
 
 ## 14. Design Conclusion
 
-The technical design demonstrates how recursive decomposition can be applied to Merge Sort to introduce parallel execution.
+El diseño técnico demuestra cómo se puede aplicar la descomposición recursiva a Merge Sort para introducir ejecución paralela.
 
-The implementation uses TPL tasks, controlled recursion depth, and synchronization to execute independent portions of the algorithm concurrently.
+La implementación utiliza tareas TPL, profundidad de recursión controlada y sincronización para ejecutar porciones independientes del algoritmo concurrentemente.
 
-The benchmark and automated tests provide evidence of both correctness and performance improvement.
+Los benchmarks y las pruebas automatizadas proporcionan evidencia tanto de la corrección funcional como de la mejora en el rendimiento.

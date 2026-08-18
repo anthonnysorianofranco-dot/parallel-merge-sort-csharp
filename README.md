@@ -1,52 +1,62 @@
 # Parallel Merge Sort in C#
 
-## Final Project – Parallel Programming
+### Proyecto Final – Programación Paralela
 
-**Topic:** Recursive Decomposition
-**Algorithm:** Parallel Merge Sort
-**Language:** C# (.NET 10)
-**Technology:** Task Parallel Library (TPL)
+- **Tema:** Descomposición Recursiva
+- **Algoritmo:** Parallel Merge Sort
+- **Lenguaje:** C# (.NET 10)
+- **Tecnología:** Task Parallel Library (TPL)
 
-## Project objective
+---
 
-Implement and evaluate a recursive parallel Merge Sort algorithm capable of sorting large volumes of data while comparing sequential and parallel execution in terms of:
+## Objetivo del Proyecto
 
-* Execution time
-* Speedup
-* Efficiency
-* Scalability
-* CPU utilization
+Implementar y evaluar un algoritmo paralelo recursivo de Merge Sort capaz de ordenar grandes volúmenes de datos, comparando la ejecución secuencial y paralela en términos de:
 
-## Repository structure
+- Tiempo de ejecución
+- Speedup (Aceleración)
+- Eficiencia
+- Escalabilidad
+- Utilización de CPU
 
-* `/docs` → project documentation
-* `/src` → source code
-* `/tests` → unit tests
-* `/metrics` → performance results and charts
+---
 
-## Team
+## Estructura del Repositorio
 
-* Anthonny Brayhan Soriano Franco (Leader)
+- `/docs` → Documentación del proyecto
+- `/src` → Código fuente
+- `/tests` → Pruebas unitarias
+- `/metrics` → Resultados de rendimiento y gráficas
 
-## Status
+---
 
-* [x] Topic approved
-* [x] Sequential implementation
-* [x] Parallel implementation
-* [x] Performance benchmarks
-* [x] Final documentation
+## Equipo
 
-## Performance Summary
+- Anthonny Brayhan Soriano Franco (Líder)
 
-The parallel implementation was evaluated using a 4-core processor.
+---
 
-The best configuration was `MaxDepth = 2`, achieving:
+## Estado del Proyecto
 
-- Average parallel execution time: **186.60 ms**
-- Average sequential execution time: **331.20 ms**
+- [x] Tema aprobado
+- [x] Implementación secuencial
+- [x] Implementación paralela
+- [x] Benchmarks de rendimiento
+- [x] Documentación final
+
+---
+
+## Resumen de Rendimiento
+
+La implementación paralela se evaluó utilizando un procesador de 4 núcleos.
+
+La mejor configuración fue **`MaxDepth = 2`**, logrando:
+
+- Tiempo promedio de ejecución paralela: **186.60 ms**
+- Tiempo promedio de ejecución secuencial: **331.20 ms**
 - Speedup: **1.77x**
-- Efficiency: **44.37%**
+- Eficiencia: **44.37%**
 
-The results showed that increasing the recursion depth beyond 2 did not improve performance due to additional task-management overhead.
+Los resultados mostraron que aumentar la profundidad de recursión más allá de 2 no mejoró el rendimiento debido al sobrecoste (*overhead*) adicional de la gestión de tareas.
 
-The scalability benchmark also showed consistent performance improvements for input sizes from 100,000 to 2,000,000 elements.
+El benchmark de escalabilidad también mostró mejoras constantes en el rendimiento para tamaños de entrada desde 100,000 hasta 2,000,000 de elementos.

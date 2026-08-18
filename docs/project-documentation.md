@@ -1,57 +1,57 @@
-
-### `docs/project-documentation.md`
-
-`markdown`
 # Project Documentation
 
 ## 1. Project Overview
 
-Parallel Merge Sort is a final project for the Parallel Programming course.
+Parallel Merge Sort es un proyecto final para la asignatura de Programación Paralela.
 
-The project demonstrates how a traditional sequential algorithm can be adapted to use parallel execution.
+El proyecto demuestra cómo un algoritmo secuencial tradicional se puede adaptar para utilizar ejecución paralela.
 
-The selected algorithm is Merge Sort, using recursive decomposition as the parallelization strategy.
+El algoritmo seleccionado es Merge Sort, utilizando la descomposición recursiva como estrategia de paralelización.
 
-The project compares sequential and parallel execution using real performance measurements.
+El proyecto compara la ejecución secuencial y paralela utilizando mediciones reales de rendimiento.
+
+---
 
 ## 2. Project Objectives
 
-The main objective is to implement and evaluate a parallel Merge Sort algorithm.
+El objetivo principal es implementar y evaluar un algoritmo paralelo de Merge Sort.
 
-Specific objectives:
+**Objetivos específicos:**
+- Implementar Merge Sort secuencial.
+- Implementar Merge Sort paralelo.
+- Utilizar descomposición recursiva.
+- Utilizar la Task Parallel Library (TPL).
+- Ejecutar tareas independientes de forma concurrente.
+- Controlar la profundidad máxima de recursión paralela.
+- Medir el tiempo de ejecución.
+- Calcular el Speedup (Aceleración).
+- Calcular la Eficiencia.
+- Evaluar la escalabilidad.
+- Validar la corrección de las implementaciones.
+- Documentar los resultados.
 
-- Implement sequential Merge Sort.
-- Implement parallel Merge Sort.
-- Use recursive decomposition.
-- Use the Task Parallel Library (TPL).
-- Execute independent tasks concurrently.
-- Control the maximum parallel recursion depth.
-- Measure execution time.
-- Calculate Speedup.
-- Calculate Efficiency.
-- Evaluate scalability.
-- Validate the correctness of the implementations.
-- Document the results.
+---
 
 ## 3. Technologies
 
-The project uses the following technologies:
+El proyecto utiliza las siguientes tecnologías:
 
-| Technology | Purpose |
+| Tecnología | Propósito |
 |---|---|
-| C# | Programming language |
-| .NET 10 | Application framework |
-| Task Parallel Library | Parallel execution |
-| xUnit | Automated testing |
-| Git | Version control |
-| GitHub | Source code repository |
-| Visual Studio | Development environment |
+| C# | Lenguaje de programación |
+| .NET 10 | Framework de la aplicación |
+| Task Parallel Library | Ejecución paralela |
+| xUnit | Pruebas automatizadas |
+| Git | Control de versiones |
+| GitHub | Repositorio de código fuente |
+| Visual Studio | Entorno de desarrollo |
+
+---
 
 ## 4. Project Structure
 
-The repository is organized as follows:
+El repositorio está organizado de la siguiente manera:
 
-`text`
 parallel-merge-sort-csharp/
 |
 +-- docs/
@@ -82,66 +82,61 @@ parallel-merge-sort-csharp/
 
 ## 5. Sequential Implementation
 
-The sequential implementation is contained in MergeSorter.cs.
+La implementación secuencial está contenida en `MergeSorter.cs`.
 
-The algorithm follows the traditional Merge Sort process:
+El algoritmo sigue el proceso tradicional de Merge Sort:
+1. Dividir el arreglo en dos mitades.
+2. Ordenar recursivamente la mitad izquierda.
+3. Ordenar recursivamente la mitad derecha.
+4. Fusionar (*merge*) las dos mitades ordenadas.
 
-Divide the array into two halves.
-Recursively sort the left half.
-Recursively sort the right half.
-Merge the two sorted halves.
+El algoritmo tiene una complejidad temporal de:
 
-The algorithm has a time complexity of:
+$$O(n \log n)$$
 
-O(n log n)
-
-The sequential implementation serves as the baseline for evaluating the parallel version.
+La implementación secuencial sirve como línea base para evaluar la versión paralela.
 
 ---
 
 ## 6. Parallel Implementation
 
-The parallel implementation is contained in ParallelMergeSorter.cs.
+La implementación paralela está contenida en `ParallelMergeSorter.cs`.
 
-It uses recursive decomposition and the Task Parallel Library.
+Utiliza descomposición recursiva y la Task Parallel Library (TPL).
 
-When the configured maximum depth has not been reached, the algorithm creates two tasks:
+Cuando no se ha alcanzado la profundidad máxima configurada, el algoritmo crea dos tareas:
+- **Tarea 1:** Ordenar mitad izquierda
+- **Tarea 2:** Ordenar mitad derecha
 
-Task 1 -> Sort left half
-Task 2 -> Sort right half
+La aplicación espera por ambas tareas mediante:
 
-The application waits for both tasks:
+`Task.WaitAll(leftTask, rightTask);`
 
-Task.WaitAll(leftTask, rightTask);
+Después de que ambas ramas terminan, el algoritmo realiza la operación de fusión.
 
-After both branches finish, the algorithm performs the merge operation.
-
-When the maximum parallel depth is reached, the remaining work is executed sequentially.
+Cuando se alcanza la profundidad máxima paralela, el trabajo restante se ejecuta secuencialmente.
 
 ---
 
 ## 7. Performance Evaluation
 
-The project measures the performance of both implementations.
+El proyecto mide el rendimiento de ambas implementaciones.
 
-The main metrics are:
+Las métricas principales son:
 
-Execution Time
+- **Tiempo de Ejecución:** El tiempo requerido para completar la operación de ordenamiento.
+- **Speedup (Aceleración):**
+  $$\text{Speedup} = \frac{\text{Tiempo Secuencial}}{\text{Tiempo Paralelo}}$$
+- **Eficiencia:**
+  $$\text{Eficiencia} = \frac{\text{Speedup}}{\text{Número de Procesadores}} \times 100$$
 
-The time required to complete the sorting operation.
-
-Speedup
-Speedup = Sequential Time / Parallel Time
-Efficiency
-Efficiency = Speedup / Processor Count × 100
-
-The current test environment has four logical processors.
+El entorno de prueba actual cuenta con cuatro procesadores lógicos.
 
 ---
 
 ## 8. Benchmark Results
 
-The scalability benchmark tested four input sizes.
+El benchmark de escalabilidad evaluó cuatro tamaños de entrada:
 
 | Input Size | Sequential Average | Parallel Average | Speedup | Efficiency |
 | ---------: | -----------------: | ---------------: | ------: | ---------: |
@@ -150,17 +145,17 @@ The scalability benchmark tested four input sizes.
 |  1,000,000 |          340.67 ms |        189.33 ms |   1.80x |     44.98% |
 |  2,000,000 |          686.33 ms |        390.00 ms |   1.76x |     44.00% |
 
-The parallel implementation was faster for every tested input size.
+La implementación paralela fue más rápida para todos los tamaños de entrada probados.
 
-The best speedup in this benchmark was 1.82x with 500,000 elements.
+El mejor Speedup en este benchmark fue de **1.82x** con 500,000 elementos.
 
 ---
 
 ## 9. Parallelization Depth Results
 
-The project also evaluates different maximum parallel depths.
+El proyecto también evalúa diferentes profundidades máximas de paralelización.
 
-Recent benchmark results for 1,000,000 elements were:
+Los resultados recientes del benchmark para 1,000,000 de elementos fueron:
 
 | MaxDepth | Average Sequential | Average Parallel | Speedup | Efficiency |
 | -------: | -----------------: | ---------------: | ------: | ---------: |
@@ -168,78 +163,71 @@ Recent benchmark results for 1,000,000 elements were:
 |        2 |          388.20 ms |        197.00 ms |   1.97x |     49.26% |
 |        3 |          358.20 ms |        205.60 ms |   1.74x |     43.56% |
 
-The best configuration in this benchmark was MaxDepth 2, with a speedup of 1.97x and an efficiency of 49.26%.
+La mejor configuración en este benchmark fue **MaxDepth = 2**, con un Speedup de **1.97x** y una Eficiencia del **49.26%**.
 
-The results demonstrate that increasing the amount of parallelism does not necessarily produce better performance.
-
-A higher depth can introduce additional task-management and synchronization overhead.
+Los resultados demuestran que aumentar la cantidad de paralelismo no produce necesariamente un mejor rendimiento, ya que una mayor profundidad puede introducir sobrecostes adicionales de gestión de tareas y sincronización.
 
 ---
 
 ## 10. Automated Testing
 
-The project uses xUnit for automated testing.
+El proyecto utiliza xUnit para pruebas automatizadas.
 
-The test suite currently reports:
+La suite de pruebas actualmente reporta:
+- Pruebas totales: 10
+- Pasadas: 10
+- Falladas: 0
+- Omitidas: 0
 
-Total tests: 10
-Passed: 10
-Failed: 0
-Skipped: 0
+Las pruebas verifican que las implementaciones de ordenamiento manejen correctamente diferentes condiciones de entrada.
 
-The tests verify that the sorting implementations correctly handle different input conditions.
-
-Correctness validation is important because performance improvements are only useful if the final sorted result remains correct.
+La validación de la corrección es crucial porque las mejoras de rendimiento solo son útiles si el resultado final ordenado sigue siendo correcto.
 
 ---
 
 ## 11. Scalability
 
-Scalability was evaluated by increasing the number of elements processed.
+La escalabilidad se evaluó incrementando el número de elementos procesados:
+- 100,000
+- 500,000
+- 1,000,000
+- 2,000,000
 
-The tested sizes were:
+Los resultados muestran que la implementación paralela mantiene una ventaja significativa de rendimiento a medida que aumenta el tamaño de la entrada.
 
-100,000
-500,000
-1,000,000
-2,000,000
+Para entradas más grandes, hay más trabajo computacional disponible para las tareas paralelas, permitiendo que los beneficios de la ejecución concurrente sean más visibles.
 
-The results show that the parallel implementation maintains a significant performance advantage as the input size increases.
-
-For larger inputs, there is more computational work available for the parallel tasks, allowing the benefits of concurrent execution to become more visible.
-
-However, speedup is limited by task scheduling, synchronization, memory access, and merge overhead.
+Sin embargo, el Speedup está limitado por la planificación de tareas, la sincronización, el acceso a memoria y el sobrecoste de fusión.
 
 ---
 
 ## 12. Correctness Validation
 
-After each benchmark execution, the application verifies that the resulting arrays are sorted.
+Después de cada ejecución de benchmark, la aplicación verifica que los arreglos resultantes estén ordenados.
 
-The validation checks every pair of adjacent elements:
+La validación comprueba cada par de elementos adyacentes:
 
-array[i - 1] <= array[i]
+`array[i - 1] <= array[i]`
 
-If any element violates this condition, the result is considered incorrect.
+Si algún elemento viola esta condición, el resultado se considera incorrecto.
 
-The benchmark executions completed with both sequential and parallel sorting results correctly validated.
+Las ejecuciones del benchmark completaron con los resultados de ordenamiento secuencial y paralelo validados correctamente.
 
 ---
 
 ## 13. Conclusions
 
-The project demonstrates that recursive decomposition can be effectively applied to Merge Sort.
+El proyecto demuestra que la descomposición recursiva se puede aplicar eficazmente a Merge Sort.
 
-The parallel implementation achieved lower execution times than the sequential implementation across the tested input sizes.
+La implementación paralela logró tiempos de ejecución menores que la implementación secuencial en todos los tamaños de entrada probados.
 
-The results also demonstrate that:
+Los resultados también demuestran que:
+- La ejecución paralela puede mejorar el rendimiento.
+- Conjuntos de datos más grandes brindan mayor oportunidad para la paralelización.
+- La cantidad de tareas debe ser controlada.
+- La profundidad máxima de recursión afecta el rendimiento.
+- La sincronización introduce sobrecoste (*overhead*).
+- La ejecución paralela no garantiza un Speedup lineal.
+- La corrección funcional debe validarse junto con el rendimiento.
 
-Parallel execution can improve performance.
-Larger datasets provide more opportunity for parallelism.
-The number of tasks must be controlled.
-Maximum recursion depth affects performance.
-Synchronization introduces overhead.
-Parallel execution does not guarantee linear speedup.
-Correctness must be validated alongside performance.
-
-The current implementation successfully demonstrates the main concepts required for a parallel programming project: concurrent execution, shared data, synchronization, recursive decomposition, performance measurement, and scalability.
+La implementación actual demuestra exitosamente los conceptos principales requeridos para un proyecto de programación paralela: ejecución concurrente, datos compartidos, sincronización, descomposición recursiva, medición de rendimiento y escalabilidad.

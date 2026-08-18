@@ -2,84 +2,74 @@
 
 ## 1. Architecture Overview
 
-Parallel Merge Sort is a C# application designed to compare a sequential implementation of Merge Sort with a parallel implementation using the Task Parallel Library (TPL).
+Parallel Merge Sort es una aplicación en C# diseñada para comparar una implementación secuencial de Merge Sort con una implementación paralela utilizando la Task Parallel Library (TPL).
 
-The parallel implementation uses recursive decomposition to divide the sorting problem into smaller independent subproblems that can be executed concurrently.
+La implementación paralela utiliza descomposición recursiva para dividir el problema de ordenamiento en subproblemas independientes más pequeños que pueden ejecutarse de forma concurrente.
 
-The architecture separates the application into sorting logic, execution and benchmarking, automated testing, documentation, and performance metrics.
+La arquitectura separa la aplicación en lógica de ordenamiento, ejecución y pruebas de rendimiento (benchmarking), pruebas automatizadas, documentación y métricas de rendimiento.
 
 ---
 
 ## 2. System Components
 
-The project contains the following main components.
+El proyecto contiene los siguientes componentes principales:
 
 ### `Program.cs`
+Actúa como el punto de entrada de la aplicación.
 
-Acts as the entry point of the application.
-
-Responsibilities:
-
-- Generate test data.
-- Execute sequential Merge Sort.
-- Execute parallel Merge Sort.
-- Measure execution times.
-- Calculate Speedup.
-- Calculate Efficiency.
-- Execute performance benchmarks.
-- Compare different parallelization depths.
-- Validate sorting results.
+**Responsabilidades:**
+- Generar datos de prueba.
+- Ejecutar el Merge Sort secuencial.
+- Ejecutar el Merge Sort paralelo.
+- Medir los tiempos de ejecución.
+- Calcular el Speedup (Aceleración).
+- Calcular la Eficiencia.
+- Ejecutar benchmarks de rendimiento.
+- Comparar diferentes profundidades de paralelización.
+- Validar los resultados del ordenamiento.
 
 ### `MergeSorter.cs`
+Contiene la implementación secuencial de Merge Sort.
 
-Contains the sequential Merge Sort implementation.
-
-Responsibilities:
-
-- Recursively divide the array.
-- Sort each portion sequentially.
-- Merge sorted portions.
-- Provide the `Merge` operation used by the sorting implementations.
+**Responsabilidades:**
+- Dividir el arreglo de forma recursiva.
+- Ordenar cada porción secuencialmente.
+- Fusionar (*merge*) las porciones ordenadas.
+- Proveer la operación `Merge` utilizada por las implementaciones de ordenamiento.
 
 ### `ParallelMergeSorter.cs`
+Contiene la implementación paralela de Merge Sort.
 
-Contains the parallel Merge Sort implementation.
-
-Responsibilities:
-
-- Apply recursive decomposition.
-- Create concurrent tasks using `Task.Run`.
-- Execute left and right branches concurrently.
-- Control the maximum parallel recursion depth.
-- Synchronize tasks using `Task.WaitAll`.
-- Use sequential execution after reaching the configured depth.
+**Responsabilidades:**
+- Aplicar descomposición recursiva.
+- Crear tareas concurrentes utilizando `Task.Run`.
+- Ejecutar las ramas izquierda y derecha de manera concurrente.
+- Controlar la profundidad máxima de recursión paralela.
+- Sincronizar las tareas utilizando `Task.WaitAll`.
+- Utilizar ejecución secuencial tras alcanzar la profundidad configurada.
 
 ### `ParallelMergeSort.Tests`
+Contiene pruebas automatizadas desarrolladas con xUnit.
 
-Contains automated tests developed with xUnit.
-
-The tests verify that the sorting implementations correctly process different types of input.
+Las pruebas verifican que las implementaciones de ordenamiento procesen correctamente diferentes tipos de entrada.
 
 ### `metrics/`
+Contiene mediciones de rendimiento y resultados de benchmarks.
 
-Contains performance measurements and benchmark results.
-
-The metrics include:
-
-- Sequential execution time.
-- Parallel execution time.
+**Las métricas incluyen:**
+- Tiempo de ejecución secuencial.
+- Tiempo de ejecución paralelo.
 - Speedup.
-- Efficiency.
-- Scalability results.
-- Parallelization depth comparisons.
+- Eficiencia.
+- Resultados de escalabilidad.
+- Comparaciones de profundidad de paralelización.
 
 ---
 
 ## 3. Execution Flow
 
-The general execution flow is:
+El flujo general de ejecución es el siguiente:
 
-`text`
                     Start
                       |
                       v
@@ -114,19 +104,17 @@ The general execution flow is:
                       v
                      End
 
-The application generates the same input data for both implementations.
+La aplicación genera los mismos datos de entrada para ambas implementaciones.
 
-The sequential algorithm sorts one copy of the data, while the parallel algorithm sorts another copy.
+El algoritmo secuencial ordena una copia de los datos, mientras que el algoritmo paralelo ordena otra copia.
 
-The execution times are measured independently and then used to calculate performance metrics.
+Los tiempos de ejecución se miden de manera independiente y luego se utilizan para calcular las métricas de rendimiento.
 
 ---
 
 ## 4. Parallel Decomposition
 
-The parallel algorithm uses recursive decomposition.
-
-The original array is divided into two smaller subproblems.
+El algoritmo paralelo utiliza descomposición recursiva:
 
                     Array
                    /     \
@@ -136,9 +124,9 @@ The original array is divided into two smaller subproblems.
             /                 \
        Left task          Right task
 
-Each branch can be processed independently because the two portions of the array do not overlap.
+Cada rama se puede procesar de forma independiente porque las dos porciones del arreglo no se superponen.
 
-The parallel implementation creates a task for each branch.
+La implementación paralela crea una tarea para cada rama:
 
                     Array
                    /     \
@@ -151,68 +139,58 @@ The parallel implementation creates a task for each branch.
                      |
                    Merge
 
-The recursion continues until the configured maximum parallel depth is reached.
+La recursión continúa hasta alcanzar la profundidad máxima paralela configurada.
 
-After reaching this limit, the remaining recursive operations are executed sequentially.
-
-This prevents the application from creating an excessive number of tasks.
+Tras alcanzar este límite, las operaciones recursivas restantes se ejecutan secuencialmente. Esto evita que la aplicación cree un número excesivo de tareas.
 
 ---
 
 ## 5. Concurrency Model
 
-The application uses the Task Parallel Library (TPL).
+La aplicación utiliza la Task Parallel Library (TPL).
 
-The main concurrent operations are created using Task.Run.
+Las operaciones concurrentes principales se crean utilizando `Task.Run`.
 
-Conceptually, the parallel algorithm performs:
+Conceptualmente, el algoritmo paralelo realiza:
 
 Task.Run(Left branch)
-Task.Run(Right branch)
-
-        |
+Task.Run(Right branch)        |
         v
-
-Task.WaitAll()
-
-        |
+Task.WaitAll()                |
         v
-
       Merge
 
-The left and right branches can execute concurrently on different processor cores.
+Las ramas izquierda y derecha pueden ejecutarse concurrentemente en diferentes núcleos del procesador.
 
-The implementation uses a maximum depth to control the amount of concurrency.
-
-The current test environment has four logical processors.
+La implementación utiliza una profundidad máxima para controlar la cantidad de concurrencia. El entorno de pruebas actual cuenta con cuatro procesadores lógicos.
 
 ---
 
 ## 6. Synchronization
 
-Synchronization is required before the two sorted portions can be merged.
+La sincronización es requerida antes de que las dos porciones ordenadas puedan fusionarse.
 
-The implementation uses:
+La implementación utiliza:
 
-Task.WaitAll(leftTask, rightTask);
+`Task.WaitAll(leftTask, rightTask);`
 
-This guarantees that both recursive tasks have completed before the `Merge` operation begins.
+Esto garantiza que ambas tareas recursivas hayan completado antes de que comience la operación `Merge`.
 
-The synchronization sequence is:
+La secuencia de sincronización es:
 
 Left Task  --------\
                     >---- Task.WaitAll ----> Merge
 Right Task --------/
 
-Without this synchronization, the merge operation could execute before one of the portions had finished sorting.
+Sin esta sincronización, la operación de fusión podría ejecutarse antes de que una de las porciones haya terminado de ordenarse.
 
 ---
 
 ## 7. Data Flow
 
-The application uses arrays of integers as the main data structure.
+La aplicación utiliza arreglos de enteros como la estructura de datos principal.
 
-The data flow is:
+El flujo de datos es:
 
 Random data
     |
@@ -232,53 +210,46 @@ Validation          Validation
               v
        Performance metrics
 
-Both algorithms receive equivalent input data so that the performance comparison is meaningful.
+Ambos algoritmos reciben datos de entrada equivalentes para que la comparación de rendimiento sea significativa.
 
 ---
 
 ## 8. Scalability
 
-The application evaluates scalability by testing different input sizes.
+La aplicación evalúa la escalabilidad probando diferentes tamaños de entrada.
 
-The benchmark includes:
+El benchmark incluye:
+- 100,000 elementos.
+- 500,000 elementos.
+- 1,000,000 elementos.
+- 2,000,000 elementos.
 
-- 100,000 elements.
-- 500,000 elements.
-- 1,000,000 elements.
-- 2,000,000 elements.
+Los resultados demuestran que la implementación paralela mantiene una ventaja de rendimiento a medida que aumenta el tamaño de la entrada.
 
-The results demonstrate that the parallel implementation maintains a performance advantage as the input size increases.
-
-For larger datasets, there is enough computational work to compensate for part of the overhead introduced by task management and synchronization.
+Para conjuntos de datos más grandes, existe suficiente trabajo computacional para compensar parte del *overhead* (sobrecoste) introducido por la gestión de tareas y la sincronización.
 
 ---
 
 ## 9. Performance Metrics
 
-The architecture supports the calculation of several performance metrics.
+La arquitectura soporta el cálculo de diversas métricas de rendimiento:
 
-Execution Time
+- **Tiempo de Ejecución:** Mide cuánto tiempo le toma a cada implementación ordenar la entrada.
+- **Speedup (Aceleración):**
+  $$\text{Speedup} = \frac{\text{Tiempo Secuencial}}{\text{Tiempo Paralelo}}$$
+  Un valor mayor a 1 significa que la implementación paralela es más rápida.
+- **Eficiencia:**
+  $$\text{Eficiencia} = \frac{\text{Speedup}}{\text{Número de Procesadores}} \times 100$$
+  Indica con qué eficacia se están utilizando los recursos de procesamiento disponibles.
 
-Measures how long each implementation takes to sort the input.
+  ---
 
-Speedup
-Speedup = Sequential Time / Parallel Time
+  ## 10. Architecture Summary
 
-A value greater than 1 means that the parallel implementation is faster.
+El sistema sigue una arquitectura centrada en el algoritmo Merge Sort.
 
-Efficiency
-Efficiency = Speedup / Number of Processors × 100
+Las implementaciones secuencial y paralela comparten la misma operación de fusión (*merge*) mientras utilizan diferentes estrategias de ejecución.
 
-This indicates how effectively the available processor resources are being used.
+La implementación paralela utiliza descomposición recursiva, `Task` y `Task.WaitAll` para ejecutar ramas independientes de forma concurrente.
 
----
-
-## 10. Architecture Summary
-
-The system follows an architecture centered around the Merge Sort algorithm.
-
-The sequential and parallel implementations share the same merge operation while using different execution strategies.
-
-The parallel implementation uses recursive decomposition, Task, and Task.WaitAll to execute independent branches concurrently.
-
-The architecture also includes automated tests and performance benchmarks to verify correctness and evaluate the benefits of parallel execution.
+La arquitectura también incluye pruebas automatizadas y benchmarks de rendimiento para verificar la corrección y evaluar los beneficios de la ejecución paralela.
