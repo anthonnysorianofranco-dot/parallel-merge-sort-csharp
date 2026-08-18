@@ -34,7 +34,7 @@ Implement and evaluate a recursive parallel Merge Sort algorithm capable of sort
 * [x] Sequential implementation
 * [x] Parallel implementation
 * [x] Performance benchmarks
-* [ ] Final documentation
+* [x] Final documentation
 
 ## Performance Summary
 
