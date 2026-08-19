@@ -54,15 +54,15 @@ La implementación paralela fue evaluada utilizando un procesador de 4 núcleos.
 
 ### Análisis de Profundidad
 
-En la ejecución de validación más reciente se obtuvieron los siguientes resultados:
+En la ejecución de validación final se obtuvieron los siguientes resultados para 1,000,000 de elementos:
 
 | MaxDepth | Tiempo Secuencial | Tiempo Paralelo | Speedup | Efficiency |
 |---------:|------------------:|----------------:|--------:|-----------:|
-| 1 | 369.40 ms | 272.00 ms | 1.36x | 33.95% |
-| 2 | 351.80 ms | 238.40 ms | 1.48x | 36.89% |
-| 3 | 331.60 ms | 198.00 ms | 1.67x | 41.87% |
+| 1 | 358.20 ms | 249.40 ms | 1.44x | 35.91% |
+| 2 | 330.40 ms | 185.20 ms | 1.78x | 44.60% |
+| 3 | 333.60 ms | 201.60 ms | 1.65x | 41.37% |
 
-En esta ejecución, **MaxDepth = 3** obtuvo el mejor rendimiento, alcanzando un Speedup de **1.67x** y una Efficiency de **41.87%**.
+En esta ejecución, **MaxDepth = 2** obtuvo el mejor rendimiento, alcanzando un Speedup de **1.78x** y una Efficiency de **44.60%**.
 
 Los resultados pueden variar ligeramente entre ejecuciones debido a factores como la carga del procesador, la planificación del sistema operativo y el overhead asociado a la creación y sincronización de tareas.
 

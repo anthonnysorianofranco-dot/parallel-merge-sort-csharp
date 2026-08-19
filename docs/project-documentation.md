@@ -159,11 +159,11 @@ Los resultados recientes del benchmark para 1,000,000 de elementos fueron:
 
 | MaxDepth | Average Sequential | Average Parallel | Speedup | Efficiency |
 | -------: | -----------------: | ---------------: | ------: | ---------: |
-|        1 |          358.80 ms |        236.60 ms |   1.52x |     37.91% |
-|        2 |          388.20 ms |        197.00 ms |   1.97x |     49.26% |
-|        3 |          358.20 ms |        205.60 ms |   1.74x |     43.56% |
+|        1 |          358.20 ms |        249.40 ms |   1.44x |     35.91% |
+|        2 |          330.40 ms |        185.20 ms |   1.78x |     44.60% |
+|        3 |          333.60 ms |        201.60 ms |   1.65x |     41.37% |
 
-La mejor configuración en este benchmark fue **MaxDepth = 2**, con un Speedup de **1.97x** y una Eficiencia del **49.26%**.
+La mejor configuración en este benchmark fue **MaxDepth = 2**, con un Speedup de **1.78x** y una Eficiencia del **44.60%**.
 
 Los resultados demuestran que aumentar la cantidad de paralelismo no produce necesariamente un mejor rendimiento, ya que una mayor profundidad puede introducir sobrecostes adicionales de gestión de tareas y sincronización.
 
