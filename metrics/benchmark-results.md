@@ -1,47 +1,57 @@
-# Benchmark Results
+# Resultados de Benchmark
 
-## Environment
+## Entorno de Pruebas
 
-- Language: C#
+- Lenguaje: C#
 - Framework: .NET 10
-- Parallelization: Task Parallel Library (TPL)
-- Processor count: 4
-- Input size for depth analysis: 1,000,000
-- Benchmark runs: 5
+- Paralelización: Task Parallel Library (TPL)
+- Cantidad de procesadores: 4
+- Tamaño de entrada para el análisis de profundidad: 1,000,000 elementos
+- Ejecuciones por benchmark: 5
 
-## Scalability Results
+## Resultados de Escalabilidad
 
-| Input Size | Average Sequential (ms) | Average Parallel (ms) | Speedup | Efficiency |
-|-----------:|------------------------:|----------------------:|--------:|-----------:|
-| 100,000    | 31.33                   | 19.33                 | 1.62x   | 40.52%     |
-| 500,000    | 169.33                  | 93.00                 | 1.82x   | 45.52%     |
-| 1,000,000  | 340.67                  | 189.33                | 1.80x   | 44.98%     |
-| 2,000,000  | 686.33                  | 390.00                | 1.76x   | 44.00%     |
+| Tamaño de entrada | Promedio Secuencial (ms) | Promedio Paralelo (ms) | Speedup | Efficiency |
+|------------------:|-------------------------:|-----------------------:|--------:|-----------:|
+| 100,000           | 31.33                    | 19.33                  | 1.62x   | 40.52%     |
+| 500,000           | 169.33                   | 93.00                  | 1.82x   | 45.52%     |
+| 1,000,000         | 340.67                   | 189.33                 | 1.80x   | 44.98%     |
+| 2,000,000         | 686.33                   | 390.00                 | 1.76x   | 44.00%     |
 
-## Parallel Depth Analysis
+## Análisis de Profundidad Paralela
 
-| MaxDepth | Average Sequential (ms) | Average Parallel (ms) | Speedup | Efficiency |
-|---------:|------------------------:|----------------------:|--------:|-----------:|
-| 1        | 341.40                  | 227.20                | 1.50x   | 37.57%     |
-| 2        | 331.20                  | 186.60                | 1.77x   | 44.37%     |
-| 3        | 332.80                  | 194.60                | 1.71x   | 42.75%     |
+| MaxDepth | Promedio Secuencial (ms) | Promedio Paralelo (ms) | Speedup | Efficiency |
+|---------:|-------------------------:|-----------------------:|--------:|-----------:|
+| 1        | 369.40                   | 272.00                 | 1.36x   | 33.95%     |
+| 2        | 351.80                   | 238.40                 | 1.48x   | 36.89%     |
+| 3        | 331.60                   | 198.00                 | 1.67x   | 41.87%     |
 
-## Analysis
+## Análisis
 
-The parallel implementation consistently outperformed the sequential implementation for all tested input sizes.
+La implementación paralela superó consistentemente a la implementación secuencial en el benchmark de escalabilidad y en las configuraciones de profundidad evaluadas.
 
-The scalability benchmark showed a speedup between 1.62x and 1.82x. The highest speedup was obtained with 500,000 elements, reaching 1.82x with an efficiency of 45.52%.
+El benchmark de escalabilidad mostró un Speedup entre 1.62x y 1.82x. El mayor Speedup se obtuvo con 500,000 elementos, alcanzando 1.82x con una Efficiency de 45.52%.
 
-For 1,000,000 elements, the parallel implementation achieved an average execution time of 189.33 ms compared with 340.67 ms for the sequential implementation.
+Para 1,000,000 de elementos, el benchmark de escalabilidad anterior obtuvo un tiempo promedio de ejecución de 189.33 ms para la implementación paralela, frente a 340.67 ms para la implementación secuencial.
 
-For 2,000,000 elements, the sequential implementation required 686.33 ms while the parallel implementation required 390.00 ms.
+Para 2,000,000 de elementos, la implementación secuencial necesitó un promedio de 686.33 ms, mientras que la implementación paralela necesitó 390.00 ms.
 
-The depth analysis showed that MaxDepth 2 provided the best balance between parallelism and task-management overhead.
+El análisis de profundidad realizado durante la validación final mostró que MaxDepth 3 obtuvo el mejor resultado en esta ejecución, con un tiempo promedio paralelo de 198.00 ms, un Speedup de 1.67x y una Efficiency de 41.87%.
 
-With MaxDepth 1, the speedup was 1.50x. Increasing the depth to 2 improved the speedup to 1.77x and increased efficiency to 44.37%.
+Con MaxDepth 1 se obtuvo un Speedup de 1.36x, mientras que MaxDepth 2 obtuvo 1.48x. Al aumentar la profundidad hasta MaxDepth 3, el rendimiento medido mejoró en esta ejecución.
 
-Increasing MaxDepth from 2 to 3 did not improve performance. The speedup decreased from 1.77x to 1.71x, indicating that the additional parallel tasks introduced overhead that outweighed the potential benefit.
+Estos resultados también demuestran que los benchmarks pueden presentar variaciones entre diferentes ejecuciones debido a factores como la carga del procesador, la planificación del sistema operativo y el overhead asociado a la administración de tareas.
 
-Therefore, MaxDepth 2 was selected as the recommended configuration for the four-core processor used during testing.
+La implementación paralela aprovecha los cuatro núcleos disponibles del procesador. Sin embargo, el Speedup no alcanza el máximo teórico debido al overhead producido por la administración de tareas, la sincronización, el acceso a memoria y las operaciones de Merge.
 
-The results demonstrate that parallel Merge Sort can take advantage of multiple processor cores while maintaining a significant performance improvement. However, speedup does not reach the theoretical maximum because of task-management, synchronization, memory access and merge overhead.
+## Conclusión
+
+Los resultados obtenidos demuestran que la aplicación de paralelismo mediante Task Parallel Library (TPL) permite reducir el tiempo de ejecución del algoritmo Merge Sort para los tamaños de entrada evaluados.
+
+La implementación paralela mostró mejoras de rendimiento frente a la versión secuencial, especialmente cuando el tamaño del problema aumenta.
+
+El análisis de profundidad también permitió observar que el nivel de paralelismo influye directamente en el rendimiento. Una mayor cantidad de tareas no garantiza necesariamente un mejor resultado, debido al overhead adicional generado por su administración y sincronización.
+
+Durante la validación final, MaxDepth 3 obtuvo el mejor resultado entre las configuraciones evaluadas. No obstante, este resultado corresponde a una ejecución específica y puede variar debido a las condiciones del sistema durante cada benchmark.
+
+En general, las pruebas confirman que el algoritmo Parallel Merge Sort puede aprovechar los recursos de un procesador de cuatro núcleos y proporcionar una mejora significativa respecto a la implementación secuencial.
