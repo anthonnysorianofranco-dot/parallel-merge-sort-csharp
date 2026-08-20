@@ -1,2 +1,4 @@
 <Solution>
+  <Project Path="../tests/ParallelMergeSort.Tests/ParallelMergeSort.Tests.csproj" />
+  <Project Path="ParallelMergeSort.App/ParallelMergeSort.App.csproj" />
 </Solution>
